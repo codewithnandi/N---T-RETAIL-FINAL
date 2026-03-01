@@ -1,6 +1,5 @@
 # Retail Shopping Management System (Admin Only)
-import os
-from dotenv import load_dotenv
+
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import sqlite3
@@ -10,11 +9,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib
 matplotlib.use('TkAgg')
 
-load_dotenv()
-
-DB_NAME = os.getenv("DB_NAME")
-ADMIN_USER = os.getenv("ADMIN_USER")
-ADMIN_PASS = os.getenv("ADMIN_PASS")
+# Database name
+DB_NAME = "retail.db"
+ADMIN_USER = "nehaxtripan"
+ADMIN_PASS = "nehaxtripan"
 
 # Elegant Olive, Beige & White Color Palette
 OLIVE_DARK = "#4A5D23"      # Deep olive (primary)
@@ -104,7 +102,7 @@ class RetailApp:
     def __init__(self, root):
         """Initialize the main application."""
         self.root = root
-        self.root.title("N & T RETAIL SHOP - Admin Panel")
+        self.root.title("N & T RETAIL SHOP - Administration")
         self.root.geometry("1200x700")
         self.root.configure(bg=BEIGE_LIGHT)
         
@@ -245,13 +243,13 @@ class RetailApp:
 
         # Store logo/title
         title_label = ttk.Label(login_card, 
-                               text="N & T RETAIL SHOP", 
+                               text="N & T RETAIL", 
                                style='Title.TLabel',
                                background=BEIGE_DARK)
         title_label.pack(pady=(40, 10))
 
         subtitle_label = tk.Label(login_card,
-                                 text="ADMIN LOGIN",
+                                 text="Administration Portal",
                                  bg=BEIGE_DARK,
                                  fg=OLIVE_MEDIUM,
                                  font=('Helvetica', 12, 'italic'))
@@ -276,20 +274,16 @@ class RetailApp:
         password_entry = ttk.Entry(form_frame, textvariable=password_var, 
                                   show="•", width=30)
         password_entry.pack(fill='x', pady=(0, 20))
-        
+
         def attempt_login():
-            username = username_var.get().strip()
-            password = password_var.get().strip()
-            
-            if username == ADMIN_USER and password == ADMIN_PASS:
+            """Validate login credentials."""
+            if username_var.get() == ADMIN_USER and password_var.get() == ADMIN_PASS:
                 self.show_dashboard()
             else:
-                messagebox.showerror(
-                    "Access Denied",
-                    "Invalid username or password.\nPlease try again.",
-                    parent=login_card
-                )
-        password_var.set("")
+                messagebox.showerror("Access Denied", 
+                                   "Invalid username or password.\nPlease try again.",
+                                   parent=login_card)
+                password_var.set("")
 
         # Login button
         login_btn = ttk.Button(form_frame, text="LOGIN", 
@@ -298,7 +292,7 @@ class RetailApp:
         login_btn.pack(pady=10)
 
         # Bind Enter key
-        self.root.bind('<Return>', lambda event: login_btn.invoke())
+        password_entry.bind('<Return>', lambda e: attempt_login())
 
         # Footer
         footer = tk.Label(login_card,
