@@ -1,5 +1,7 @@
 //Python:
 3.12.x
 
-//Install from scratch:
-pip install -r requirements.txt
+username
+admin
+password 
+admin

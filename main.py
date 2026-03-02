@@ -11,8 +11,8 @@ matplotlib.use('TkAgg')
 
 # Database name
 DB_NAME = "retail.db"
-ADMIN_USER = "nehaxtripan"
-ADMIN_PASS = "nehaxtripan"
+ADMIN_USER = "admin"
+ADMIN_PASS = "admin"
 
 # Elegant Olive, Beige & White Color Palette
 OLIVE_DARK = "#4A5D23"      # Deep olive (primary)
@@ -260,7 +260,7 @@ class RetailApp:
         form_frame.pack(pady=10, padx=40, fill='x')
 
         # Username
-        ttk.Label(form_frame, text="Username:", 
+        ttk.Label(form_frame, text=" Username:", 
                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         username_var = tk.StringVar()
         username_entry = ttk.Entry(form_frame, textvariable=username_var, width=30)
@@ -268,7 +268,7 @@ class RetailApp:
         username_entry.focus()
 
         # Password
-        ttk.Label(form_frame, text="Password:", 
+        ttk.Label(form_frame, text=" Password:", 
                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         password_var = tk.StringVar()
         password_entry = ttk.Entry(form_frame, textvariable=password_var, 
@@ -296,7 +296,7 @@ class RetailApp:
 
         # Footer
         footer = tk.Label(login_card,
-                         text="© 2024 N & T Retail Solutions",
+                         text="© 2026 N & T Retail Solutions",
                          bg=BEIGE_DARK,
                          fg=OLIVE_LIGHT,
                          font=('Helvetica', 8))
