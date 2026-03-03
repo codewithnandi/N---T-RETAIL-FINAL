@@ -102,7 +102,7 @@ class RetailApp:
     def __init__(self, root):
         """Initialize the main application."""
         self.root = root
-        self.root.title("N & T RETAIL SHOP - Administration")
+        self.root.title("N & T RETAIL SHOP - Admin section")
         self.root.geometry("1200x700")
         self.root.configure(bg=BEIGE_LIGHT)
         
@@ -243,13 +243,13 @@ class RetailApp:
 
         # Store logo/title
         title_label = ttk.Label(login_card, 
-                               text="N & T RETAIL", 
+                               text="N & T RETAIL STORE", 
                                style='Title.TLabel',
                                background=BEIGE_DARK)
         title_label.pack(pady=(40, 10))
 
         subtitle_label = tk.Label(login_card,
-                                 text="Administration Portal",
+                                 text="Admin Portal",
                                  bg=BEIGE_DARK,
                                  fg=OLIVE_MEDIUM,
                                  font=('Helvetica', 12, 'italic'))
