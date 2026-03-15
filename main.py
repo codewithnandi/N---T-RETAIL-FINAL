@@ -11,8 +11,8 @@ matplotlib.use('TkAgg')
 
 # Database name
 DB_NAME = "retail.db"
-ADMIN_USER = "admin"
-ADMIN_PASS = "admin"
+ADMIN_USER = "neha"
+ADMIN_PASS = "tripan"
 
 # Elegant Olive, Beige & White Color Palette
 OLIVE_DARK = "#4A5D23"      # Deep olive (primary)
@@ -102,7 +102,7 @@ class RetailApp:
     def __init__(self, root):
         """Initialize the main application."""
         self.root = root
-        self.root.title("N & T RETAIL SHOP - Admin section")
+        self.root.title("N & T RETAIL SHOP - Administration")
         self.root.geometry("1200x700")
         self.root.configure(bg=BEIGE_LIGHT)
         
@@ -114,6 +114,9 @@ class RetailApp:
         
         # Shopping cart for multi-item billing
         self.cart = []  # List of dicts: {'product_id': id, 'name': name, 'price': price, 'quantity': qty, 'total': total}
+        
+        # Reference for product list frame (for refreshing without returning to dashboard)
+        self.products_list_frame = None
         
         # Configure styles
         self.setup_styles()
@@ -243,13 +246,13 @@ class RetailApp:
 
         # Store logo/title
         title_label = ttk.Label(login_card, 
-                               text="N & T RETAIL STORE", 
+                               text="N & T RETAIL SHOP", 
                                style='Title.TLabel',
                                background=BEIGE_DARK)
         title_label.pack(pady=(40, 10))
 
         subtitle_label = tk.Label(login_card,
-                                 text="Admin Portal",
+                                 text="Administration Portal",
                                  bg=BEIGE_DARK,
                                  fg=OLIVE_MEDIUM,
                                  font=('Helvetica', 12, 'italic'))
@@ -260,7 +263,7 @@ class RetailApp:
         form_frame.pack(pady=10, padx=40, fill='x')
 
         # Username
-        ttk.Label(form_frame, text=" Username:", 
+        ttk.Label(form_frame, text="Username:", 
                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         username_var = tk.StringVar()
         username_entry = ttk.Entry(form_frame, textvariable=username_var, width=30)
@@ -268,7 +271,7 @@ class RetailApp:
         username_entry.focus()
 
         # Password
-        ttk.Label(form_frame, text=" Password:", 
+        ttk.Label(form_frame, text="Password:", 
                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         password_var = tk.StringVar()
         password_entry = ttk.Entry(form_frame, textvariable=password_var, 
@@ -296,7 +299,7 @@ class RetailApp:
 
         # Footer
         footer = tk.Label(login_card,
-                         text="© 2026 N & T Retail Solutions",
+                         text="© 2024 N & T Retail Solutions",
                          bg=BEIGE_DARK,
                          fg=OLIVE_LIGHT,
                          font=('Helvetica', 8))
@@ -344,9 +347,9 @@ class RetailApp:
         # Statistics cards
         stats = [
             ("Total Products", total_products, "📦"),
-            ("Total Sales", total_sales, "💰"),
-            ("Total Revenue", f"₹ {total_revenue:,.2f}", "📊"),
-            ("Low Stock Items", low_stock, "⚠️")
+            ("Monthly Sales", total_sales, "💰"),
+            ("Monthly Revenue", f"₹ {total_revenue:,.2f}", "📊"),
+            ("Low Stock & Out of Stock Items", low_stock, "⚠️")
         ]
 
         for i, (title, value, icon) in enumerate(stats):
@@ -502,15 +505,14 @@ class RetailApp:
 
     def display_products_list(self):
         """Display products in a treeview."""
-        # Clear previous list if exists
-        for widget in self.main_container.winfo_children():
-            if isinstance(widget, ttk.Frame) and widget != self.main_container.winfo_children()[0]:
-                if len(widget.winfo_children()) > 0 and isinstance(widget.winfo_children()[0], ttk.Treeview):
-                    widget.destroy()
+        # Remove the previous list frame if it exists
+        if self.products_list_frame and self.products_list_frame.winfo_exists():
+            self.products_list_frame.destroy()
 
         # Products list frame
         list_frame = ttk.Frame(self.main_container)
         list_frame.pack(fill='both', expand=True, padx=30, pady=(0, 20))
+        self.products_list_frame = list_frame   # Store reference
 
         # Header with title and restock button
         header_frame = ttk.Frame(list_frame)
@@ -617,7 +619,7 @@ class RetailApp:
             # Update stock in database
             self.db.execute("UPDATE products SET stock = stock + ? WHERE id = ?", (qty, product_id))
             messagebox.showinfo("Success", f"Added {qty} units to '{product_name}'.\nNew stock: {current_stock + qty}")
-            # Refresh the product list
+            # Refresh the product list (stays in the same view)
             self.display_products_list()
         except Exception as e:
             messagebox.showerror("Error", f"Failed to restock: {str(e)}")
