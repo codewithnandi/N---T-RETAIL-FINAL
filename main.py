@@ -1,4 +1,5 @@
 # Retail Shopping Management System (Admin Only)
+# Redesigned with clean, minimal theme – olive, beige & white, flat cards, centered layout
 
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
@@ -7,6 +8,7 @@ from datetime import datetime, date
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib
+
 matplotlib.use('TkAgg')
 
 # Database name
@@ -23,6 +25,7 @@ BEIGE_LIGHT = "#F5F0E6"     # Light beige (background)
 WHITE = "#FFFFFF"           # Pure white (foregrounds, entries)
 OFF_WHITE = "#FAF7F0"       # Off-white (alternate)
 ACCENT = "#C0A080"          # Warm accent (hover)
+
 
 # ================= DATABASE =================
 class Database:
@@ -46,7 +49,7 @@ class Database:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """)
-        
+
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS sales(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,11 +61,11 @@ class Database:
             FOREIGN KEY (product_id) REFERENCES products(id)
         )
         """)
-        
+
         self.cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_sales_date ON sales(sale_date)
         """)
-        
+
         self.conn.commit()
 
     def ensure_sale_time_column(self):
@@ -105,26 +108,26 @@ class RetailApp:
         self.root.title("N & T RETAIL SHOP - Administration")
         self.root.geometry("1200x700")
         self.root.configure(bg=BEIGE_LIGHT)
-        
+
         # Center window on screen
         self.center_window()
-        
+
         # Initialize database
         self.db = Database()
-        
+
         # Shopping cart for multi-item billing
         self.cart = []  # List of dicts: {'product_id': id, 'name': name, 'price': price, 'quantity': qty, 'total': total}
-        
+
         # Reference for product list frame (for refreshing without returning to dashboard)
         self.products_list_frame = None
-        
+
         # Configure styles
         self.setup_styles()
-        
+
         # Main container
         self.main_container = ttk.Frame(self.root, style='Main.TFrame')
         self.main_container.pack(fill="both", expand=True)
-        
+
         # Show login screen
         self.show_login()
 
@@ -138,97 +141,103 @@ class RetailApp:
         self.root.geometry(f'{width}x{height}+{x}+{y}')
 
     def setup_styles(self):
-        """Configure ttk styles for elegant olive, beige and white theme."""
+        """Configure ttk styles for clean, flat, beige-themed UI."""
         style = ttk.Style()
         style.theme_use('clam')
 
-        # Main background
+        # Base frame background – soft beige
+        style.configure('TFrame', background=BEIGE_LIGHT)
         style.configure('Main.TFrame', background=BEIGE_LIGHT)
-        style.configure('Card.TFrame', background=BEIGE_DARK, relief='raised', borderwidth=1)
+
+        # Card frames – flat, no borders, dark beige background
+        style.configure('Card.TFrame',
+                        background=BEIGE_DARK,
+                        relief='flat',
+                        borderwidth=0)
 
         # Labels
-        style.configure('Title.TLabel', 
-                       background=BEIGE_LIGHT, 
-                       foreground=OLIVE_DARK,
-                       font=('Helvetica', 24, 'bold'))
-        
-        style.configure('Heading.TLabel', 
-                       background=BEIGE_LIGHT, 
-                       foreground=OLIVE_MEDIUM,
-                       font=('Helvetica', 14, 'bold'))
-        
-        style.configure('CardTitle.TLabel', 
-                       background=BEIGE_DARK, 
-                       foreground=OLIVE_DARK,
-                       font=('Helvetica', 12, 'bold'))
-        
-        style.configure('CardValue.TLabel', 
-                       background=BEIGE_DARK, 
-                       foreground=OLIVE_MEDIUM,
-                       font=('Helvetica', 20, 'bold'))
+        style.configure('Title.TLabel',
+                        background=BEIGE_LIGHT,
+                        foreground=OLIVE_DARK,
+                        font=('Helvetica', 24, 'bold'))
+
+        style.configure('Heading.TLabel',
+                        background=BEIGE_LIGHT,
+                        foreground=OLIVE_MEDIUM,
+                        font=('Helvetica', 14, 'bold'))
+
+        style.configure('CardTitle.TLabel',
+                        background=BEIGE_DARK,
+                        foreground=OLIVE_DARK,
+                        font=('Helvetica', 12, 'bold'))
+
+        style.configure('CardValue.TLabel',
+                        background=BEIGE_DARK,
+                        foreground=OLIVE_MEDIUM,
+                        font=('Helvetica', 20, 'bold'))
 
         # Buttons
         style.configure('Primary.TButton',
-                       background=OLIVE_DARK,
-                       foreground=WHITE,
-                       borderwidth=0,
-                       focusthickness=2,
-                       focuscolor=OLIVE_LIGHT,
-                       font=('Helvetica', 10, 'bold'),
-                       padding=(20, 10))
+                        background=OLIVE_DARK,
+                        foreground=WHITE,
+                        borderwidth=0,
+                        focusthickness=2,
+                        focuscolor=OLIVE_LIGHT,
+                        font=('Helvetica', 10, 'bold'),
+                        padding=(20, 10))
         style.map('Primary.TButton',
-                 background=[('active', OLIVE_MEDIUM), ('pressed', OLIVE_LIGHT)],
-                 foreground=[('active', WHITE)])
+                  background=[('active', OLIVE_MEDIUM), ('pressed', OLIVE_LIGHT)],
+                  foreground=[('active', WHITE)])
 
         style.configure('Secondary.TButton',
-                       background=OLIVE_MEDIUM,
-                       foreground=WHITE,
-                       borderwidth=0,
-                       focusthickness=2,
-                       focuscolor=OLIVE_LIGHT,
-                       font=('Helvetica', 10, 'bold'),
-                       padding=(20, 10))
+                        background=OLIVE_MEDIUM,
+                        foreground=WHITE,
+                        borderwidth=0,
+                        focusthickness=2,
+                        focuscolor=OLIVE_LIGHT,
+                        font=('Helvetica', 10, 'bold'),
+                        padding=(20, 10))
         style.map('Secondary.TButton',
-                 background=[('active', OLIVE_DARK), ('pressed', OLIVE_LIGHT)],
-                 foreground=[('active', WHITE)])
+                  background=[('active', OLIVE_DARK), ('pressed', OLIVE_LIGHT)],
+                  foreground=[('active', WHITE)])
 
         # Entry fields
         style.configure('TEntry',
-                       fieldbackground=WHITE,
-                       foreground=OLIVE_DARK,
-                       borderwidth=1,
-                       relief='solid',
-                       padding=5)
-        
+                        fieldbackground=WHITE,
+                        foreground=OLIVE_DARK,
+                        borderwidth=1,
+                        relief='solid',
+                        padding=5)
+
         style.configure('TCombobox',
-                       fieldbackground=WHITE,
-                       foreground=OLIVE_DARK,
-                       borderwidth=1,
-                       padding=5)
+                        fieldbackground=WHITE,
+                        foreground=OLIVE_DARK,
+                        borderwidth=1,
+                        padding=5)
 
         # Treeview
         style.configure('Treeview',
-                       background=WHITE,
-                       foreground=OLIVE_DARK,
-                       fieldbackground=WHITE,
-                       borderwidth=0,
-                       font=('Helvetica', 10))
+                        background=WHITE,
+                        foreground=OLIVE_DARK,
+                        fieldbackground=WHITE,
+                        borderwidth=0,
+                        font=('Helvetica', 10))
         style.map('Treeview',
-                 background=[('selected', OLIVE_LIGHT)],
-                 foreground=[('selected', WHITE)])
-        
+                  background=[('selected', OLIVE_LIGHT)],
+                  foreground=[('selected', WHITE)])
+
         style.configure('Treeview.Heading',
-                       background=BEIGE_DARK,
-                       foreground=OLIVE_DARK,
-                       font=('Helvetica', 10, 'bold'),
-                       borderwidth=1,
-                       relief='solid')
+                        background=BEIGE_DARK,
+                        foreground=OLIVE_DARK,
+                        font=('Helvetica', 10, 'bold'),
+                        borderwidth=1,
+                        relief='solid')
 
         # Scrollbar
         style.configure('TScrollbar',
-                       background=BEIGE_DARK,
-                       troughcolor=BEIGE_LIGHT,
-                       arrowcolor=OLIVE_DARK)
+                        background=BEIGE_DARK,
+                        troughcolor=BEIGE_LIGHT,
+                        arrowcolor=OLIVE_DARK)
 
     def clear_frame(self):
         """Clear all widgets from the main container."""
@@ -240,22 +249,22 @@ class RetailApp:
         """Display the login screen."""
         self.clear_frame()
 
-        # Create centered card
+        # Create centered card – flat, no border
         login_card = ttk.Frame(self.main_container, style='Card.TFrame')
         login_card.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)
 
         # Store logo/title
-        title_label = ttk.Label(login_card, 
-                               text="N & T RETAIL SHOP", 
-                               style='Title.TLabel',
-                               background=BEIGE_DARK)
+        title_label = ttk.Label(login_card,
+                                text="N & T RETAIL SHOP",
+                                style='Title.TLabel',
+                                background=BEIGE_DARK)
         title_label.pack(pady=(40, 10))
 
         subtitle_label = tk.Label(login_card,
-                                 text="Administration Portal",
-                                 bg=BEIGE_DARK,
-                                 fg=OLIVE_MEDIUM,
-                                 font=('Helvetica', 12, 'italic'))
+                                  text="Administration Portal",
+                                  bg=BEIGE_DARK,
+                                  fg=OLIVE_MEDIUM,
+                                  font=('Helvetica', 12, 'italic'))
         subtitle_label.pack(pady=(0, 20))
 
         # Login form
@@ -263,19 +272,19 @@ class RetailApp:
         form_frame.pack(pady=10, padx=40, fill='x')
 
         # Username
-        ttk.Label(form_frame, text="Username:", 
-                 style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
+        ttk.Label(form_frame, text="Username:",
+                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         username_var = tk.StringVar()
         username_entry = ttk.Entry(form_frame, textvariable=username_var, width=30)
         username_entry.pack(fill='x', pady=(0, 10))
         username_entry.focus()
 
         # Password
-        ttk.Label(form_frame, text="Password:", 
-                 style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
+        ttk.Label(form_frame, text="Password:",
+                  style='CardTitle.TLabel').pack(anchor='w', pady=(10, 5))
         password_var = tk.StringVar()
-        password_entry = ttk.Entry(form_frame, textvariable=password_var, 
-                                  show="•", width=30)
+        password_entry = ttk.Entry(form_frame, textvariable=password_var,
+                                   show="•", width=30)
         password_entry.pack(fill='x', pady=(0, 20))
 
         def attempt_login():
@@ -283,15 +292,15 @@ class RetailApp:
             if username_var.get() == ADMIN_USER and password_var.get() == ADMIN_PASS:
                 self.show_dashboard()
             else:
-                messagebox.showerror("Access Denied", 
-                                   "Invalid username or password.\nPlease try again.",
-                                   parent=login_card)
+                messagebox.showerror("Access Denied",
+                                     "Invalid username or password.\nPlease try again.",
+                                     parent=login_card)
                 password_var.set("")
 
         # Login button
-        login_btn = ttk.Button(form_frame, text="LOGIN", 
-                              style='Primary.TButton',
-                              command=attempt_login)
+        login_btn = ttk.Button(form_frame, text="LOGIN",
+                               style='Primary.TButton',
+                               command=attempt_login)
         login_btn.pack(pady=10)
 
         # Bind Enter key
@@ -299,10 +308,10 @@ class RetailApp:
 
         # Footer
         footer = tk.Label(login_card,
-                         text="© 2024 N & T Retail Solutions",
-                         bg=BEIGE_DARK,
-                         fg=OLIVE_LIGHT,
-                         font=('Helvetica', 8))
+                          text="© 2024 N & T Retail Solutions",
+                          bg=BEIGE_DARK,
+                          fg=OLIVE_LIGHT,
+                          font=('Helvetica', 8))
         footer.pack(side='bottom', pady=10)
 
     # ================= DASHBOARD =================
@@ -313,17 +322,17 @@ class RetailApp:
         # Header
         header_frame = ttk.Frame(self.main_container)
         header_frame.pack(fill='x', padx=30, pady=(20, 10))
-        
-        ttk.Label(header_frame, text="Dashboard", 
-                 style='Title.TLabel').pack(side='left')
-        
+
+        ttk.Label(header_frame, text="Dashboard",
+                  style='Title.TLabel').pack(side='left')
+
         # Date display
         current_date = datetime.now().strftime("%B %d, %Y")
         date_label = tk.Label(header_frame,
-                            text=current_date,
-                            bg=BEIGE_LIGHT,
-                            fg=OLIVE_MEDIUM,
-                            font=('Helvetica', 12))
+                              text=current_date,
+                              bg=BEIGE_LIGHT,
+                              fg=OLIVE_MEDIUM,
+                              font=('Helvetica', 12))
         date_label.pack(side='right')
 
         # Statistics cards
@@ -344,7 +353,7 @@ class RetailApp:
         cards_frame = ttk.Frame(self.main_container)
         cards_frame.pack(pady=30)
 
-        # Statistics cards
+        # Statistics cards – flat, no shadows
         stats = [
             ("Total Products", total_products, "📦"),
             ("Monthly Sales", total_sales, "💰"),
@@ -355,19 +364,19 @@ class RetailApp:
         for i, (title, value, icon) in enumerate(stats):
             card = ttk.Frame(cards_frame, style='Card.TFrame', padding=20)
             card.grid(row=0, column=i, padx=15, pady=10, sticky='nsew')
-            
+
             # Icon and title
-            tk.Label(card, text=icon, bg=BEIGE_DARK, 
-                    fg=OLIVE_DARK, font=('Helvetica', 24)).pack()
-            
-            ttk.Label(card, text=title, 
-                     style='CardTitle.TLabel').pack(pady=(5, 10))
-            
+            tk.Label(card, text=icon, bg=BEIGE_DARK,
+                     fg=OLIVE_DARK, font=('Helvetica', 24)).pack()
+
+            ttk.Label(card, text=title,
+                      style='CardTitle.TLabel').pack(pady=(5, 10))
+
             # Value
             value_label = tk.Label(card, text=value,
-                                  bg=BEIGE_DARK,
-                                  fg=OLIVE_DARK if i < 3 else '#C04040',
-                                  font=('Helvetica', 18, 'bold'))
+                                   bg=BEIGE_DARK,
+                                   fg=OLIVE_DARK if i < 3 else '#C04040',
+                                   font=('Helvetica', 18, 'bold'))
             value_label.pack()
 
     def display_navigation_buttons(self):
@@ -384,10 +393,10 @@ class RetailApp:
 
         for i, (text, command) in enumerate(buttons):
             style = 'Secondary.TButton' if i < 3 else 'Primary.TButton'
-            btn = ttk.Button(nav_frame, text=text, 
-                           style=style, width=25,
-                           command=command)
-            btn.grid(row=i//2, column=i%2, padx=10, pady=10)
+            btn = ttk.Button(nav_frame, text=text,
+                             style=style, width=25,
+                             command=command)
+            btn.grid(row=i // 2, column=i % 2, padx=10, pady=10)
 
     # ================= PRODUCT MANAGEMENT =================
     def manage_products(self):
@@ -397,15 +406,15 @@ class RetailApp:
         # Header
         header_frame = ttk.Frame(self.main_container)
         header_frame.pack(fill='x', padx=30, pady=(20, 10))
-        
-        ttk.Label(header_frame, text="Product Management", 
-                 style='Title.TLabel').pack(side='left')
-        
-        ttk.Button(header_frame, text="← Back to Dashboard",
-                  style='Secondary.TButton',
-                  command=self.show_dashboard).pack(side='right')
 
-        # Product entry form
+        ttk.Label(header_frame, text="Product Management",
+                  style='Title.TLabel').pack(side='left')
+
+        ttk.Button(header_frame, text="← Back to Dashboard",
+                   style='Secondary.TButton',
+                   command=self.show_dashboard).pack(side='right')
+
+        # Product entry form – flat card
         self.create_product_form()
 
         # Products list
@@ -416,9 +425,9 @@ class RetailApp:
         form_frame = ttk.Frame(self.main_container, style='Card.TFrame', padding=20)
         form_frame.pack(fill='x', padx=30, pady=20)
 
-        ttk.Label(form_frame, text="Add New Product", 
-                 style='Heading.TLabel',
-                 background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
+        ttk.Label(form_frame, text="Add New Product",
+                  style='Heading.TLabel',
+                  background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
 
         # Input fields
         fields_frame = ttk.Frame(form_frame, style='Card.TFrame')
@@ -430,27 +439,27 @@ class RetailApp:
         self.category_var = tk.StringVar()
         self.price_var = tk.DoubleVar()
         self.stock_var = tk.IntVar()
-        
+
         vars_list = [self.product_name_var, self.category_var, self.price_var, self.stock_var]
 
         for i, (label, var) in enumerate(zip(labels, vars_list)):
             # Label
-            ttk.Label(fields_frame, text=label, 
-                     style='CardTitle.TLabel',
-                     background=BEIGE_DARK).grid(row=i//2, column=(i%2)*2, 
-                                                padx=(20 if i%2==0 else 10, 5), 
-                                                pady=10, sticky='w')
-            
+            ttk.Label(fields_frame, text=label,
+                      style='CardTitle.TLabel',
+                      background=BEIGE_DARK).grid(row=i // 2, column=(i % 2) * 2,
+                                                  padx=(20 if i % 2 == 0 else 10, 5),
+                                                  pady=10, sticky='w')
+
             # Entry
             entry = ttk.Entry(fields_frame, textvariable=var, width=25)
-            entry.grid(row=i//2, column=(i%2)*2 + 1, 
-                      padx=(0, 20), pady=10, sticky='w')
+            entry.grid(row=i // 2, column=(i % 2) * 2 + 1,
+                       padx=(0, 20), pady=10, sticky='w')
 
         # Add button
         ttk.Button(fields_frame, text="➕ Add Product",
-                  style='Primary.TButton',
-                  command=self.add_product).grid(row=2, column=0, columnspan=4, 
-                                                pady=(20, 10))
+                   style='Primary.TButton',
+                   command=self.add_product).grid(row=2, column=0, columnspan=4,
+                                                  pady=(20, 10))
 
     def add_product(self):
         """Add a new product to database."""
@@ -462,18 +471,18 @@ class RetailApp:
             stock = self.stock_var.get()
 
             if not all([name, category]):
-                messagebox.showwarning("Validation Error", 
-                                     "Please fill in all fields.")
+                messagebox.showwarning("Validation Error",
+                                       "Please fill in all fields.")
                 return
 
             if price <= 0:
-                messagebox.showwarning("Validation Error", 
-                                     "Price must be greater than 0.")
+                messagebox.showwarning("Validation Error",
+                                       "Price must be greater than 0.")
                 return
 
             if stock < 0:
-                messagebox.showwarning("Validation Error", 
-                                     "Stock cannot be negative.")
+                messagebox.showwarning("Validation Error",
+                                       "Stock cannot be negative.")
                 return
 
             # Insert into database
@@ -482,24 +491,24 @@ class RetailApp:
                 VALUES (?, ?, ?, ?)
             """, (name, category, price, stock))
 
-            messagebox.showinfo("Success", 
-                              f"Product '{name}' added successfully!")
-            
+            messagebox.showinfo("Success",
+                                f"Product '{name}' added successfully!")
+
             # Clear form
             self.product_name_var.set("")
             self.category_var.set("")
             self.price_var.set(0)
             self.stock_var.set(0)
-            
+
             # Refresh products list
             self.display_products_list()
 
         except sqlite3.IntegrityError:
-            messagebox.showerror("Error", 
-                               "Product with this name already exists.")
+            messagebox.showerror("Error",
+                                 "Product with this name already exists.")
         except ValueError:
-            messagebox.showerror("Error", 
-                               "Please enter valid numeric values for price and stock.")
+            messagebox.showerror("Error",
+                                 "Please enter valid numeric values for price and stock.")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
@@ -512,15 +521,15 @@ class RetailApp:
         # Products list frame
         list_frame = ttk.Frame(self.main_container)
         list_frame.pack(fill='both', expand=True, padx=30, pady=(0, 20))
-        self.products_list_frame = list_frame   # Store reference
+        self.products_list_frame = list_frame  # Store reference
 
         # Header with title and restock button
         header_frame = ttk.Frame(list_frame)
         header_frame.pack(fill='x', pady=(0, 10))
-        
-        ttk.Label(header_frame, text="Current Products", 
-                 style='Heading.TLabel').pack(side='left')
-        
+
+        ttk.Label(header_frame, text="Current Products",
+                  style='Heading.TLabel').pack(side='left')
+
         ttk.Button(header_frame, text="🔄 Restock Selected Product", style='Secondary.TButton',
                    command=self.restock_product).pack(side='right', padx=5)
 
@@ -534,7 +543,7 @@ class RetailApp:
 
         # Treeview
         columns = ("ID", "Product Name", "Category", "Price (₹)", "Stock", "Status")
-        self.products_tree = ttk.Treeview(tree_frame, columns=columns, 
+        self.products_tree = ttk.Treeview(tree_frame, columns=columns,
                                           show="headings", height=12,
                                           yscrollcommand=vsb.set,
                                           xscrollcommand=hsb.set)
@@ -559,7 +568,7 @@ class RetailApp:
 
         # Fetch and display products
         products = self.db.fetchall("SELECT * FROM products ORDER BY name")
-        
+
         for product in products:
             # Determine stock status
             stock = product[4]
@@ -575,7 +584,7 @@ class RetailApp:
 
             # Insert with tags for color coding
             self.products_tree.insert("", "end", values=(
-                product[0], product[1], product[2], 
+                product[0], product[1], product[2],
                 f"₹ {product[3]:,.2f}", product[4], status
             ), tags=(tag,))
 
@@ -587,13 +596,13 @@ class RetailApp:
         # Summary
         total_products = len(products)
         total_stock = sum(p[4] for p in products)
-        
+
         summary_frame = ttk.Frame(list_frame)
         summary_frame.pack(fill='x', pady=10)
-        
-        ttk.Label(summary_frame, 
-                 text=f"Total Products: {total_products} | Total Stock Units: {total_stock}",
-                 style='Heading.TLabel').pack(side='left')
+
+        ttk.Label(summary_frame,
+                  text=f"Total Products: {total_products} | Total Stock Units: {total_stock}",
+                  style='Heading.TLabel').pack(side='left')
 
     def restock_product(self):
         """Increase stock for the selected product."""
@@ -609,9 +618,9 @@ class RetailApp:
         product_name = item['values'][1]
 
         # Ask for quantity to add
-        qty = simpledialog.askinteger("Restock Product", 
-                                       f"Enter additional quantity for '{product_name}':\nCurrent stock: {current_stock}",
-                                       parent=self.root, minvalue=1, maxvalue=10000)
+        qty = simpledialog.askinteger("Restock Product",
+                                      f"Enter additional quantity for '{product_name}':\nCurrent stock: {current_stock}",
+                                      parent=self.root, minvalue=1, maxvalue=10000)
         if qty is None or qty <= 0:
             return
 
@@ -633,25 +642,25 @@ class RetailApp:
         # Header
         header_frame = ttk.Frame(self.main_container)
         header_frame.pack(fill='x', padx=30, pady=(20, 10))
-        
-        ttk.Label(header_frame, text="Sales Management", 
-                 style='Title.TLabel').pack(side='left')
-        
+
+        ttk.Label(header_frame, text="Sales Management",
+                  style='Title.TLabel').pack(side='left')
+
         ttk.Button(header_frame, text="← Back to Dashboard",
-                  style='Secondary.TButton',
-                  command=self.show_dashboard).pack(side='right')
+                   style='Secondary.TButton',
+                   command=self.show_dashboard).pack(side='right')
 
         # Main content: two columns - left for adding items, right for cart
         main_content = ttk.Frame(self.main_container)
         main_content.pack(fill='both', expand=True, padx=30, pady=10)
 
-        # Left column - Add to cart form
+        # Left column - Add to cart form (flat card)
         left_frame = ttk.Frame(main_content, style='Card.TFrame', padding=20)
         left_frame.pack(side='left', fill='both', expand=True, padx=(0, 10))
 
-        ttk.Label(left_frame, text="Add Item to Cart", 
-                 style='Heading.TLabel',
-                 background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
+        ttk.Label(left_frame, text="Add Item to Cart",
+                  style='Heading.TLabel',
+                  background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
 
         # Product selection
         products = self.db.fetchall("SELECT id, name, price, stock FROM products WHERE stock > 0 ORDER BY name")
@@ -659,7 +668,7 @@ class RetailApp:
             tk.Label(left_frame, text="No products available.", bg=BEIGE_DARK, fg=OLIVE_DARK).pack()
         else:
             ttk.Label(left_frame, text="Select Product:", style='CardTitle.TLabel',
-                     background=BEIGE_DARK).pack(anchor='w', pady=5)
+                      background=BEIGE_DARK).pack(anchor='w', pady=5)
             product_list = [f"{p[1]} (Stock: {p[3]} | ₹ {p[2]:,.2f})" for p in products]
             self.cart_product_var = tk.StringVar()
             product_cb = ttk.Combobox(left_frame, textvariable=self.cart_product_var,
@@ -667,7 +676,7 @@ class RetailApp:
             product_cb.pack(fill='x', pady=5)
 
             ttk.Label(left_frame, text="Quantity:", style='CardTitle.TLabel',
-                     background=BEIGE_DARK).pack(anchor='w', pady=5)
+                      background=BEIGE_DARK).pack(anchor='w', pady=5)
             self.cart_qty_var = tk.IntVar(value=1)
             qty_spin = ttk.Spinbox(left_frame, from_=1, to=999, textvariable=self.cart_qty_var, width=20)
             qty_spin.pack(anchor='w', pady=5)
@@ -676,13 +685,13 @@ class RetailApp:
             ttk.Button(left_frame, text="➕ Add to Cart", style='Secondary.TButton',
                        command=self.add_to_cart).pack(pady=15)
 
-        # Right column - Cart contents
+        # Right column - Cart contents (flat card)
         right_frame = ttk.Frame(main_content, style='Card.TFrame', padding=20)
         right_frame.pack(side='right', fill='both', expand=True, padx=(10, 0))
 
-        ttk.Label(right_frame, text="Shopping Cart", 
-                 style='Heading.TLabel',
-                 background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
+        ttk.Label(right_frame, text="Shopping Cart",
+                  style='Heading.TLabel',
+                  background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
 
         # Cart treeview
         cart_frame = ttk.Frame(right_frame)
@@ -797,7 +806,6 @@ class RetailApp:
             return
 
         # Get the product_id of the selected item by matching name and price
-        # (since name is unique, we can use it)
         item_values = self.cart_tree.item(selected[0], 'values')
         item_name = item_values[0]
         item_price = float(item_values[1].replace('₹', '').replace(',', '').strip())
@@ -886,7 +894,7 @@ class RetailApp:
     def display_todays_sales(self):
         """Display today's sales summary with fallback for missing sale_time."""
         today = date.today().isoformat()
-        
+
         # Remove old today's sales frame if exists
         for widget in self.main_container.winfo_children():
             if isinstance(widget, ttk.Frame) and widget.winfo_name() == "todays_sales_frame":
@@ -916,13 +924,13 @@ class RetailApp:
         if not sales:
             return
 
-        # Summary frame
+        # Summary frame – flat card
         summary_frame = ttk.Frame(self.main_container, style='Card.TFrame', padding=20, name="todays_sales_frame")
         summary_frame.pack(fill='both', expand=True, padx=30, pady=20)
 
-        ttk.Label(summary_frame, text="Today's Sales", 
-                 style='Heading.TLabel',
-                 background=BEIGE_DARK).pack(anchor='w', pady=(0, 10))
+        ttk.Label(summary_frame, text="Today's Sales",
+                  style='Heading.TLabel',
+                  background=BEIGE_DARK).pack(anchor='w', pady=(0, 10))
 
         # Treeview for today's sales
         tree_frame = ttk.Frame(summary_frame)
@@ -950,7 +958,7 @@ class RetailApp:
                 product_name = sale[0]
                 quantity = sale[1]
                 total = sale[2]
-                
+
             tree.insert("", "end", values=(
                 time_str,
                 product_name,
@@ -968,10 +976,10 @@ class RetailApp:
         # Daily total
         daily_total = sum(sale[3] if use_sale_time else sale[2] for sale in sales)
         total_label = tk.Label(summary_frame,
-                              text=f"Today's Total Sales: ₹ {daily_total:,.2f}",
-                              bg=BEIGE_DARK,
-                              fg=OLIVE_DARK,
-                              font=('Helvetica', 12, 'bold'))
+                               text=f"Today's Total Sales: ₹ {daily_total:,.2f}",
+                               bg=BEIGE_DARK,
+                               fg=OLIVE_DARK,
+                               font=('Helvetica', 12, 'bold'))
         total_label.pack(pady=10)
 
     # ================= SALES ANALYSIS =================
@@ -982,33 +990,33 @@ class RetailApp:
         # Header
         header_frame = ttk.Frame(self.main_container)
         header_frame.pack(fill='x', padx=30, pady=(20, 10))
-        
-        ttk.Label(header_frame, text="Sales Analysis", 
-                 style='Title.TLabel').pack(side='left')
-        
+
+        ttk.Label(header_frame, text="Sales Analysis",
+                  style='Title.TLabel').pack(side='left')
+
         ttk.Button(header_frame, text="← Back to Dashboard",
-                  style='Secondary.TButton',
-                  command=self.show_dashboard).pack(side='right')
+                   style='Secondary.TButton',
+                   command=self.show_dashboard).pack(side='right')
 
         # Check if sales data exists
         sales_count = self.db.fetchone("SELECT COUNT(*) FROM sales")[0]
-        
+
         if sales_count == 0:
             # No data message
             no_data_frame = ttk.Frame(self.main_container, style='Card.TFrame', padding=50)
             no_data_frame.pack(expand=True, padx=30, pady=50)
-            
-            tk.Label(no_data_frame, 
-                    text="📊 No Sales Data Available",
-                    bg=BEIGE_DARK,
-                    fg=OLIVE_DARK,
-                    font=('Helvetica', 18, 'bold')).pack()
-            
+
             tk.Label(no_data_frame,
-                    text="Start making sales to see analytics!",
-                    bg=BEIGE_DARK,
-                    fg=OLIVE_MEDIUM,
-                    font=('Helvetica', 12)).pack(pady=10)
+                     text="📊 No Sales Data Available",
+                     bg=BEIGE_DARK,
+                     fg=OLIVE_DARK,
+                     font=('Helvetica', 18, 'bold')).pack()
+
+            tk.Label(no_data_frame,
+                     text="Start making sales to see analytics!",
+                     bg=BEIGE_DARK,
+                     fg=OLIVE_MEDIUM,
+                     font=('Helvetica', 12)).pack(pady=10)
             return
 
         # Create notebook for tabs
@@ -1041,12 +1049,12 @@ class RetailApp:
 
         if not data:
             ttk.Label(parent, text="No daily data available",
-                     style='Heading.TLabel').pack(pady=50)
+                      style='Heading.TLabel').pack(pady=50)
             return
 
         # Reverse for chronological order
         data = list(reversed(data))
-        
+
         dates = [d[0][5:] for d in data]  # Show MM-DD only
         counts = [d[1] for d in data]
         revenues = [d[2] for d in data]
@@ -1094,7 +1102,7 @@ class RetailApp:
 
         if not data:
             ttk.Label(parent, text="No product data available",
-                     style='Heading.TLabel').pack(pady=50)
+                      style='Heading.TLabel').pack(pady=50)
             return
 
         products = [d[0][:15] + "..." if len(d[0]) > 15 else d[0] for d in data]
@@ -1116,16 +1124,16 @@ class RetailApp:
         # Add value labels
         for i, bar in enumerate(bars1):
             width = bar.get_width()
-            ax1.text(width + 0.5, bar.get_y() + bar.get_height()/2,
-                    f'{int(width)}', ha='left', va='center', fontweight='bold')
+            ax1.text(width + 0.5, bar.get_y() + bar.get_height() / 2,
+                     f'{int(width)}', ha='left', va='center', fontweight='bold')
 
         # Revenue pie chart
         colors = [OLIVE_DARK, OLIVE_MEDIUM, OLIVE_LIGHT, BEIGE_DARK, ACCENT]
-        wedges, texts, autotexts = ax2.pie(revenues, labels=products, 
-                                           autopct='%1.1f%%',
-                                           colors=colors[:len(products)],
-                                           textprops={'color': OLIVE_DARK, 'fontweight': 'bold'})
-        
+        wedges, texts, autotexts = ax2.pie(revenues, labels=products,
+                                            autopct='%1.1f%%',
+                                            colors=colors[:len(products)],
+                                            textprops={'color': OLIVE_DARK, 'fontweight': 'bold'})
+
         # Style percentage labels
         for autotext in autotexts:
             autotext.set_color(WHITE)
@@ -1157,15 +1165,15 @@ class RetailApp:
         if not stats or stats[0] == 0:
             return
 
-        # Summary frame
+        # Summary frame – flat card
         summary_frame = ttk.Frame(self.main_container, style='Card.TFrame', padding=20)
         summary_frame.pack(fill='x', padx=30, pady=(0, 20))
 
-        ttk.Label(summary_frame, text="Sales Summary", 
-                 style='Heading.TLabel',
-                 background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
+        ttk.Label(summary_frame, text="Sales Summary",
+                  style='Heading.TLabel',
+                  background=BEIGE_DARK).pack(anchor='w', pady=(0, 15))
 
-        # Create metrics grid
+        # Create metrics grid – flat white cards
         metrics = [
             ("📅 Active Days", stats[0]),
             ("💰 Total Transactions", stats[1]),
@@ -1179,25 +1187,26 @@ class RetailApp:
         metrics_frame.pack(fill='x')
 
         for i, (label, value) in enumerate(metrics):
-            metric_card = tk.Frame(metrics_frame, bg=WHITE, relief='raised', bd=1)
-            metric_card.grid(row=i//3, column=i%3, padx=10, pady=10, sticky='nsew')
-            
-            tk.Label(metric_card, text=label, bg=WHITE, 
-                    fg=OLIVE_MEDIUM, font=('Helvetica', 10)).pack(pady=(10, 5))
-            
-            tk.Label(metric_card, text=value, bg=WHITE,
-                    fg=OLIVE_DARK, font=('Helvetica', 14, 'bold')).pack(pady=(0, 10))
+            # Flat white card with no border
+            metric_card = tk.Frame(metrics_frame, bg=WHITE, relief='flat', bd=0, highlightthickness=0)
+            metric_card.grid(row=i // 3, column=i % 3, padx=10, pady=10, sticky='nsew')
 
-            metrics_frame.grid_columnconfigure(i%3, weight=1)
+            tk.Label(metric_card, text=label, bg=WHITE,
+                     fg=OLIVE_MEDIUM, font=('Helvetica', 10)).pack(pady=(10, 5))
+
+            tk.Label(metric_card, text=value, bg=WHITE,
+                     fg=OLIVE_DARK, font=('Helvetica', 14, 'bold')).pack(pady=(0, 10))
+
+            metrics_frame.grid_columnconfigure(i % 3, weight=1)
 
 
 # ================= MAIN EXECUTION =================
 if __name__ == "__main__":
     root = tk.Tk()
     app = RetailApp(root)
-    
+
     # Make window resizable with minimum size
     root.minsize(1000, 600)
-    
+
     # Start the application
     root.mainloop()
